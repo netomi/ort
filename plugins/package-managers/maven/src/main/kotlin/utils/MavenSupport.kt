@@ -719,25 +719,31 @@ class MavenSupport(private val workspaceReader: WorkspaceReader) {
         val declaredLicenses = parseLicenses(mavenProject)
         val declaredLicensesProcessed = processDeclaredLicenses(declaredLicenses)
 
-        val binaryRemoteArtifact = localProject?.let {
-            RemoteArtifact.EMPTY
-        } ?: requestRemoteArtifact(artifact, repositories, useReposFromDependencies)
-
-        val isBinaryArtifactModified = isArtifactModified(artifact, binaryRemoteArtifact)
-
-        val sourceRemoteArtifact = when {
-            localProject != null -> RemoteArtifact.EMPTY
-            artifact.extension == "pom" -> binaryRemoteArtifact
-            else -> {
-                val sourceArtifact = artifact.let {
-                    DefaultArtifact(it.groupId, it.artifactId, "sources", "jar", it.version)
-                }
-
-                requestRemoteArtifact(sourceArtifact, repositories, useReposFromDependencies)
-            }
+	    if (useReposFromDependencies) {
+           println("Test")
         }
 
-        val isSourceArtifactModified = isArtifactModified(artifact, sourceRemoteArtifact)
+        val binaryRemoteArtifact = RemoteArtifact.EMPTY
+        val sourceRemoteArtifact = RemoteArtifact.EMPTY
+//        val binaryRemoteArtifact = localProject?.let {
+//            RemoteArtifact.EMPTY
+//        } ?: requestRemoteArtifact(artifact, repositories, useReposFromDependencies)
+//
+//        val isBinaryArtifactModified = isArtifactModified(artifact, binaryRemoteArtifact)
+//
+//        val sourceRemoteArtifact = when {
+//            localProject != null -> RemoteArtifact.EMPTY
+//            artifact.extension == "pom" -> binaryRemoteArtifact
+//            else -> {
+//                val sourceArtifact = artifact.let {
+//                    DefaultArtifact(it.groupId, it.artifactId, "sources", "jar", it.version)
+//                }
+//
+//                requestRemoteArtifact(sourceArtifact, repositories, useReposFromDependencies)
+//            }
+//        }
+//
+//        val isSourceArtifactModified = isArtifactModified(artifact, sourceRemoteArtifact)
 
         val vcsFromPackage = parseVcsInfo(mavenProject)
         val localDirectory = localProject?.file?.parentFile?.let {
@@ -785,7 +791,7 @@ class MavenSupport(private val workspaceReader: WorkspaceReader) {
             vcsProcessed = vcsProcessed,
             isMetadataOnly = (mavenProject.packaging == "pom" && binaryRemoteArtifact.url.endsWith(".pom"))
                 || isSpringMetadataProject,
-            isModified = isBinaryArtifactModified || isSourceArtifactModified
+            isModified = false // isBinaryArtifactModified || isSourceArtifactModified
         )
     }
 
