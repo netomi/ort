@@ -720,7 +720,7 @@ class MavenSupport(private val workspaceReader: WorkspaceReader) {
         val declaredLicensesProcessed = processDeclaredLicenses(declaredLicenses)
 
 	    if (useReposFromDependencies) {
-           println("Test")
+            logger.debug { "Nothing" }
         }
 
         val binaryRemoteArtifact = RemoteArtifact.EMPTY

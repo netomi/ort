@@ -46,6 +46,7 @@ import org.ossreviewtoolkit.model.config.RepositoryConfiguration
 import org.ossreviewtoolkit.model.readValueOrNull
 import org.ossreviewtoolkit.model.utils.DefaultResolutionProvider
 import org.ossreviewtoolkit.model.utils.mergeLabels
+import org.ossreviewtoolkit.model.utils.toClearlyDefinedCoordinates
 import org.ossreviewtoolkit.plugins.commands.api.OrtCommand
 import org.ossreviewtoolkit.plugins.commands.api.utils.SeverityStatsPrinter
 import org.ossreviewtoolkit.plugins.commands.api.utils.configurationGroup
@@ -202,6 +203,15 @@ class AnalyzerCommand : OrtCommand(
 
         outputDir.safeMkdirs()
         writeOrtResult(ortResult, outputFiles, terminal)
+        val clearlyDefinedFile = outputDir.resolve("clearlydefined.txt")
+        clearlyDefinedFile.bufferedWriter().use { writer ->
+            for (dep in ortResult.getPackages()) {
+                dep.metadata.toClearlyDefinedCoordinates()?.let { coord ->
+                    writer.write(coord.toString())
+                    writer.newLine()
+                }
+            }
+        }
 
         val analyzerRun = ortResult.analyzer
         if (analyzerRun == null) {
