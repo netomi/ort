@@ -332,8 +332,12 @@ class MavenSupport(private val workspaceReader: WorkspaceReader) {
 
     private var lastRepository: ArtifactRepository? = null
     private val repositoryListener = object: AbstractRepositoryListener() {
+        var artifactId: String? = null
+
         override fun artifactResolved(event: RepositoryEvent?) {
-            lastRepository = event?.repository
+            if (event?.artifact?.artifactId?.equals(artifactId) == true) {
+                lastRepository = event.repository
+            }
         }
     }
 
@@ -690,14 +694,20 @@ class MavenSupport(private val workspaceReader: WorkspaceReader) {
     ): Package {
         val mavenRepositorySystem = containerLookup<MavenRepositorySystem>()
         val projectBuilder = containerLookup<ProjectBuilder>()
-        val projectBuildingRequest = createProjectBuildingRequest(false)
 
-//        projectBuildingRequest.remoteRepositories = repositories.map { repo ->
-//            // As the ID might be used as the key when generating a metadata file name, avoid the URL being used as the
-//            // ID as the URL is likely to contain characters like ":" which not all file systems support.
-//            val id = repo.id.takeUnless { it == repo.url } ?: repo.host
-//            mavenRepositorySystem.createRepository(repo.url, id, true, null, true, null, null)
-//        } + projectBuildingRequest.remoteRepositories
+        if (artifact.artifactId.contains("cbi")) {
+            println("cbi")
+        }
+        lastRepository = null
+        repositoryListener.artifactId = artifact.artifactId
+        val projectBuildingRequest = createProjectBuildingRequest(true)
+
+        projectBuildingRequest.remoteRepositories = repositories.map { repo ->
+            // As the ID might be used as the key when generating a metadata file name, avoid the URL being used as the
+            // ID as the URL is likely to contain characters like ":" which not all file systems support.
+            val id = repo.id.takeUnless { it == repo.url } ?: repo.host
+            mavenRepositorySystem.createRepository(repo.url, id, true, null, true, null, null)
+        } + projectBuildingRequest.remoteRepositories
 
         val localProject = localProjects[artifact.identifier()]
 
