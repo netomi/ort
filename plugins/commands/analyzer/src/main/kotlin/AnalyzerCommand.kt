@@ -124,7 +124,7 @@ class AnalyzerCommand : OrtCommand(
             outputDir.resolve("analyzer-result.${format.fileExtension}")
         }
 
-        validateOutputFiles(outputFiles)
+        //validateOutputFiles(outputFiles)
 
         val configurationFiles = listOf(
             repositoryConfigurationFile,

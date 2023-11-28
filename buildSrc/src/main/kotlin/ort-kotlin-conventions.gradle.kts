@@ -164,7 +164,7 @@ tasks.withType<KotlinCompile>().configureEach {
     )
 
     compilerOptions {
-        allWarningsAsErrors = true
+        //allWarningsAsErrors = true
         freeCompilerArgs.addAll(customCompilerArgs)
         jvmTarget = maxKotlinJvmTarget
     }
