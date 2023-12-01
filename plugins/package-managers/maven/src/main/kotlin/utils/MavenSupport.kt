@@ -56,21 +56,15 @@ import org.eclipse.aether.RepositorySystem
 import org.eclipse.aether.RepositorySystemSession
 import org.eclipse.aether.artifact.Artifact
 import org.eclipse.aether.artifact.DefaultArtifact
-import org.eclipse.aether.impl.RemoteRepositoryManager
-import org.eclipse.aether.impl.RepositoryConnectorProvider
 import org.eclipse.aether.repository.MirrorSelector
 import org.eclipse.aether.repository.RemoteRepository
 import org.eclipse.aether.repository.WorkspaceReader
 import org.eclipse.aether.resolution.ArtifactDescriptorRequest
 import org.eclipse.aether.resolution.ArtifactRequest
-import org.eclipse.aether.spi.connector.ArtifactDownload
 import org.eclipse.aether.spi.connector.layout.RepositoryLayout
 import org.eclipse.aether.spi.connector.layout.RepositoryLayoutProvider
 import org.eclipse.aether.spi.connector.transport.GetTask
 import org.eclipse.aether.spi.connector.transport.TransporterProvider
-import org.eclipse.aether.transfer.AbstractTransferListener
-import org.eclipse.aether.transfer.NoRepositoryConnectorException
-import org.eclipse.aether.transfer.TransferEvent
 import org.eclipse.aether.util.repository.JreProxySelector
 
 import org.ossreviewtoolkit.analyzer.PackageManager
