@@ -64,6 +64,7 @@ import org.eclipse.aether.resolution.ArtifactRequest
 import org.eclipse.aether.spi.connector.layout.RepositoryLayout
 import org.eclipse.aether.spi.connector.layout.RepositoryLayoutProvider
 import org.eclipse.aether.spi.connector.transport.GetTask
+import org.eclipse.aether.spi.connector.transport.PeekTask
 import org.eclipse.aether.spi.connector.transport.TransporterProvider
 import org.eclipse.aether.util.repository.JreProxySelector
 
@@ -559,6 +560,21 @@ class MavenSupport(private val workspaceReader: WorkspaceReader) {
                 Hash.NONE
             }
 
+            if (hash == Hash.NONE) {
+                val artifactFound = runCatching {
+                    val task = PeekTask(info.location)
+                    transporter.peek(task)
+                    true
+                }.getOrElse {
+                    it.showStackTrace()
+                    logger.warn { "Could not get artifact '$artifact': ${it.collectMessages()}" }
+                    false
+                }
+
+                if (!artifactFound) {
+                    return@forEach
+                }
+            }
             return RemoteArtifact(info.downloadUrl, hash).also { remoteArtifact ->
                 logger.debug { "Writing remote artifact for '$artifact' to disk cache." }
                 remoteArtifactCache.write(cacheKey, remoteArtifact.toYaml())
