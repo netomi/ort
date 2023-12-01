@@ -661,11 +661,11 @@ class MavenSupport(private val workspaceReader: WorkspaceReader) {
 
         // retrieve the pom file for the artifact to know from which repository it is coming
         val pomArtifact = artifact.let {
-            DefaultArtifact(it.groupId, it.artifactId, it.classifier, "pom", it.version)
+            DefaultArtifact(it.groupId, it.artifactId, null, "pom", it.version)
         }
         val pomArtifactRequest = ArtifactRequest(pomArtifact, repositories, "project")
         val result = containerLookup<RepositorySystem>().resolveArtifact(repositorySystemSession, pomArtifactRequest)
-        val artifactRepository = result.repository as RemoteRepository
+        val artifactRepository = result.repository
 
         // reconstruct all repositories that would be used for resolving the artifact
         // the repositories are used to construct a cache key for the artifact
@@ -681,14 +681,19 @@ class MavenSupport(private val workspaceReader: WorkspaceReader) {
             repositories
         }.toSet()
 
-        val binaryRemoteArtifact = localProject?.let {
-            RemoteArtifact.EMPTY
-        } ?: requestRemoteArtifact(artifact, artifactRepository, allRepositories.toList())
+        val binaryRemoteArtifact = when {
+            localProject != null -> RemoteArtifact.EMPTY
+            artifactRepository !is RemoteRepository -> RemoteArtifact.EMPTY
+            else -> {
+                requestRemoteArtifact(artifact, artifactRepository, allRepositories.toList())
+            }
+        }
 
         val isBinaryArtifactModified = isArtifactModified(artifact, binaryRemoteArtifact)
 
         val sourceRemoteArtifact = when {
             localProject != null -> RemoteArtifact.EMPTY
+            artifactRepository !is RemoteRepository -> RemoteArtifact.EMPTY
             artifact.extension == "pom" -> binaryRemoteArtifact
             else -> {
                 val sourceArtifact = artifact.let {
